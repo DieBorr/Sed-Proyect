@@ -89,7 +89,7 @@
             <nStopA1X>0</nStopA1X>
             <nStopA2X>0</nStopA2X>
           </AfterMake>
-          <SelectedForBatchBuild>0</SelectedForBatchBuild>
+          <SelectedForBatchBuild>1</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
         </TargetCommonOption>
         <CommonProperty>
@@ -453,9 +453,19 @@
           </GroupOption>
           <Files>
             <File>
+              <FileName>reg_masks.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\reg_masks.h</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>pwm.c</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\pwm.c</FilePath>
             </File>
           </Files>
         </Group>
