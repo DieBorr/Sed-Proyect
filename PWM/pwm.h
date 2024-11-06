@@ -15,7 +15,7 @@ void pwm_config(float Tpwm)
  {
   LPC_SC->PCONP |= (1<<6);
   LPC_GPIO0->FIODIR |= (PIN_DIR_WHEEL_L | PIN_DIR_WHEEL_R); // wheel dir pins como output In(3) / In(1)
-  LPC_GPIO0->FIOCLR = (PIN_DIR_WHEEL_L | PIN_DIR_WHEEL_R);  // wheel dir pins = 0 (positiva)
+  LPC_GPIO0->FIOSET = (PIN_DIR_WHEEL_L | PIN_DIR_WHEEL_R);  // wheel dir pins = 0 (positiva)
   LPC_PINCON->PINSEL3 |= (0x2 << 10) | (0x2 << 16);         // P1.21 as PWM1.3 output  P1.24 output as PWM1.5 for R // Se colocan en In(4) / In(2) respectivamente.
   LPC_PWM1->MR0 = (F_pclk * Tpwm) - 1;                      // 25KHZ / 1000 -1 = 24 , mr0 envia un cambio de nivel al contar 24 entradas (24+1) 
   LPC_PWM1->PCR |= (1 << 11) | (1 << 13);                   // Enable PWM1.3 y PWM1.5
@@ -35,7 +35,7 @@ float pwm_get_period()
 
 void pwm_set_duty_cycle(float dc_L, float dc_R) 
 {
-  if( dc_L >= 0 ) // horario visto desde el culo del motor
+  if( dc_L > 0 ) // horario visto desde el culo del motor
   {  
     LPC_GPIO0->FIOCLR = PIN_DIR_WHEEL_L;
     LPC_PWM1->MR3 = LPC_PWM1->MR0 * dc_L; // La se;al empieza en nivel alto, cuando llega a MR3 baja, y despues al llegar a mr0 vuelve a subir, por tanto MR3 es de menor valor que mr0
@@ -45,7 +45,7 @@ void pwm_set_duty_cycle(float dc_L, float dc_R)
     LPC_GPIO0->FIOSET = PIN_DIR_WHEEL_L;
     LPC_PWM1->MR3 = LPC_PWM1->MR0 * (1 + dc_L );
   }
-  if( dc_R >= 0 )
+  if( dc_R > 0 )
   {
     LPC_GPIO0->FIOCLR = PIN_DIR_WHEEL_R;
     LPC_PWM1->MR5 = LPC_PWM1->MR0 * dc_R; // La se;al empieza en nivel alto, cuando llega a MR3 baja, y despues al llegar a mr0 vuelve a subir, por tanto MR3 es de menor valor que mr0
@@ -94,6 +94,6 @@ float pwm_get_duty_cycle(int wheel)
 void pwm_stop(void) 
 {
   pwm_set_duty_cycle(0,0) ;
-  LPC_GPIO0->FIOCLR |= PIN_DIR_WHEEL_L; // Igualamos tensiones de los bornes para que se pare cuanto antes
-  LPC_GPIO0->FIOCLR |= PIN_DIR_WHEEL_R;
+  LPC_GPIO0->FIOSET |= PIN_DIR_WHEEL_L; // Igualamos tensiones de los bornes para que se pare cuanto antes
+  LPC_GPIO0->FIOSET |= PIN_DIR_WHEEL_R;
 }
