@@ -1,4 +1,4 @@
-#include "pwm.h"
+#include "pwm.c"
 
 int main()
 {

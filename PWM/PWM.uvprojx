@@ -463,9 +463,9 @@
               <FilePath>.\main.c</FilePath>
             </File>
             <File>
-              <FileName>pwm.h</FileName>
+              <FileName>pwm.c</FileName>
               <FileType>5</FileType>
-              <FilePath>.\pwm.h</FilePath>
+              <FilePath>.\pwm.c</FilePath>
             </File>
           </Files>
         </Group>

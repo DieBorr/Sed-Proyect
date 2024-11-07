@@ -1,4 +1,4 @@
-#include "../PWM/pwm.h" //incluimos el header con funciones de pwm del anterior hito
+#include "../PWM/pwm.c" //incluimos el header con funciones de pwm del anterior hito
 #include <LPC17xx.h>
 #include <math.h>
 
@@ -11,7 +11,7 @@
 #define ENCODER_PPR       11          // encoder pulses per revolution
 #define EDGES             4           // QEI resolution (inc/dec per cycle)
 #define R_GEARBOX         35          // gearbox reduction ratio
-#define Wheel_R           6.656 / 2
+#define Wheel_R           6.60 / 2
 
 
 float static k_speed;
@@ -79,8 +79,8 @@ int main() {
   _qei_pos_token = 1;
    pwm_set_duty_cycle(-0.25,0.25); // Set duty cycle to 100%
   
-  distance = 20;
-  while( distance * 0.97 > _cm) {
+  distance = 2 * 3.14 * Wheel_R;
+  while( distance * 0.93 > _cm) {
     _rpm = LPC_QEI->QEIPOS;
     dir = (LPC_QEI->QEISTAT & 0x1)? -1 : +1;
     if( dir == 1) {
@@ -96,10 +96,10 @@ int main() {
       }
     }
     _cm = ( _qei_pos / ( R_GEARBOX * ENCODER_PPR * EDGES )) * 2 * 3.14 * Wheel_R ;
-    _qei_speed = ( LPC_QEI->QEICAP * 60 * dir ) / ( R_GEARBOX * ENCODER_PPR * EDGES * T_Speed );
-    if(distance * 0.75 <= _cm ) pwm_set_duty_cycle(-0.23,0.23);
+    _qei_speed = ( LPC_QEI->QEICAP * dir * 2 * 3.14 * Wheel_R) / ( R_GEARBOX * ENCODER_PPR * EDGES * T_Speed );
+    //if(distance * 0.75 <= _cm ) pwm_set_duty_cycle(-0.15,0.15);
   }  
   pwm_stop();
-
+while(1);
   return 0;
 }
