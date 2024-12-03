@@ -75,9 +75,10 @@ int main()
   _qei_pos_old = _qei_pos;
   _cm = ( _qei_pos / ( R_GEARBOX * ENCODER_PPR) );                              // * 2 * 3.14 * Wheel_R ;
    pwm_set_duty_cycle(-0.25,0.25);                                              // Set duty cycle to 25%
-  
+ 
+  // La finalidad del ciclo while es que la distancia siempre sea positiva aunque la direccion sea negativa para poder tener la distancia recorrida efectiva.
   distance = 2 * 3.14 * Wheel_R;
-  while( distance * 0.93 > _cm)
+  while( distance * 0.93 > _cm)   
   {
     _rpm = LPC_QEI->QEIPOS;
     dir = (LPC_QEI->QEISTAT & 0x1)? -1 : +1;
