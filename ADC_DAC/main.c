@@ -1,4 +1,5 @@
 #include <LPC17xx.h>
+#include <math.h>
 #include "../PWM/reg_masks.h"
 
 // Constantes
@@ -8,10 +9,51 @@
 #define Vref          3.3
 #define M_PI          3.14159265358979323846f
 #define N_POINTS      16
+#define DAC_N_BITS    10
+#define DAC_N_LEVELS (1U << DAC_N_BITS)
+#define DAC_MID_RANGE (1U << (DAC_N_BITS-1))
 
 static uint16_t sample_table[N_POINTS];
-static int sample_idx;
+static uint8_t  sample_idx;
 
+void alarm_init(void)
+{
+  int i;
+  float x;
+  LPC_PINCON->PINSEL1 |= (2 << 20);            // DAC output = P0.26 (AOUT)
+  LPC_PINCON->PINMODE1 |= (2 << 20);           // disable pull up & down
+  LPC_DAC->DACCTRL = 0;
+  LPC_SC->PCONP |= (1 << 22);
+  LPC_TIM2->MCR = (1 << 0) | (1 << 1);         // Reset en MR0.0 e interrupción
+  NVIC_EnableIRQ(TIMER2_IRQn);                 // Habilitar IRQ de Timer1
+
+  for(i = 0; i < N_POINTS; i++) {
+    x = DAC_MID_RANGE+(DAC_MID_RANGE-1)*sinf((2*M_PI/N_POINTS)*i);
+  sample_table[i] = ((uint16_t)x) << 6;
+  }
+  sample_idx = 0;
+}
+
+void alarm_gen_sample(void)
+{
+  LPC_DAC->DACR = (uint32_t) sample_table[sample_idx];
+  sample_idx = (sample_idx == (N_POINTS-1))? 0 : sample_idx+1;
+}
+
+void alarm_set_freq(int freq_hz)
+{
+  LPC_TIM2->TCR  =   (1 << 1);                    // Reset Timer2
+  LPC_TIM2->TCR &=  ~(1 << 1);                    // Limpiamos ese uno
+  LPC_TIM2->MR0  =   ( F_pclk / freq_hz );
+  LPC_TIM2->TCR  =   (1 << 0);                    // Iniciar Timer2
+}
+
+void TIMER2_IRQHandler()
+{
+  LPC_TIM2->IR |= (1 << 0); // Clear int flag
+  alarm_gen_sample();
+
+}
 
 // Variables globales
 volatile float speed;
@@ -69,9 +111,10 @@ void battery_sampling_init(float Ts)
   {
     LPC_TIM0->MR1 = (Ts * F_pclk) - 1;           // Configurar tiempo Ts
     LPC_TIM0->EMR &= ~(3 << 6);                  // Clear del registro
-    LPC_TIM0->EMR |= (2 << 6);                   // Set en Mat0.1
-    LPC_TIM0->TCR = (1 << 1);                    // Reset Timer0
-    LPC_TIM0->TCR = (1 << 0);                    // Iniciar Timer0
+    LPC_TIM0->EMR |=  (2 << 6);                   // Set en Mat0.1
+    LPC_TIM0->TCR |=  (1 << 1);                    // Reset Timer0
+    LPC_TIM0->TCR &= ~(1 << 1);               
+    LPC_TIM0->TCR |=  (1 << 0);                    // Iniciar Timer0
 
     batteryInit = 1;                             // Marcar inicialización
     batteryTrigger = 0;
@@ -132,7 +175,7 @@ void ADC_IRQHandler(void)
 
   // Verificar conversión de AD0.1 (velocidad)
   if (LPC_ADC->ADDR1 & (1 << 31) && speedTrigger)
-  {
+  { 
     speed = ((LPC_ADC->ADDR1 >> 4) & 0x0FFC) / 4095.0;
     speedValidation = 1;             // Señalar medición correcta
     LPC_ADC->ADCR &= ~(1 << 1);      // Desactivamos el canal ya que solo lo necesitamos una vez
@@ -143,6 +186,7 @@ void ADC_IRQHandler(void)
 
 int main()
 {
+  /*
   ADC_init();  // Inicializar ADC
   battery_sampling_init(2.5);
   speed_get_value(1);  // Inicializar muestreo de velocidad (3 Hz)
@@ -160,4 +204,8 @@ int main()
       batValidation = 0; // Limpiar flag de validación de batería
     }
   }
+  */
+  alarm_init();
+  alarm_set_freq(10000);
+  while(1);
 }

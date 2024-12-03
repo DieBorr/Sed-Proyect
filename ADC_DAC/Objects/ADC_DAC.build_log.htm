@@ -30,17 +30,17 @@ Rebuild target 'Target 1'
 assembling startup_LPC17xx.s...
 compiling system_LPC17xx.c...
 compiling main.c...
-main.c(116): warning:  #61-D: integer operation result is out of range
+main.c(165): warning:  #61-D: integer operation result is out of range
     if (LPC_ADC->ADDR0 & (1 << 31) && batteryTrigger && !((LPC_ADC->ADGDR >> 24) & (0x7)) ) // Sabemos que se ha ejecutado esta conversión gracias al Mat0.1
-main.c(116): warning:  #68-D: integer conversion resulted in a change of sign
+main.c(165): warning:  #68-D: integer conversion resulted in a change of sign
     if (LPC_ADC->ADDR0 & (1 << 31) && batteryTrigger && !((LPC_ADC->ADGDR >> 24) & (0x7)) ) // Sabemos que se ha ejecutado esta conversión gracias al Mat0.1
-main.c(128): warning:  #61-D: integer operation result is out of range
+main.c(177): warning:  #61-D: integer operation result is out of range
     if (LPC_ADC->ADDR1 & (1 << 31) && speedTrigger)
-main.c(128): warning:  #68-D: integer conversion resulted in a change of sign
+main.c(177): warning:  #68-D: integer conversion resulted in a change of sign
     if (LPC_ADC->ADDR1 & (1 << 31) && speedTrigger)
 main.c: 4 warnings, 0 errors
 linking...
-Program Size: Code=4156 RO-data=252 RW-data=24 ZI-data=608  
+Program Size: Code=5636 RO-data=284 RW-data=28 ZI-data=644  
 ".\Objects\ADC_DAC.axf" - 0 Error(s), 4 Warning(s).
 
 <h2>Software Packages used:</h2>
@@ -68,10 +68,10 @@ Package Vendor: Keil
    * Component: ARM::CMSIS:CORE:5.4.0
 
    * Component: Keil::Device:Startup:1.0.0
-      Source file:   Device\Source\ARM\startup_LPC17xx.s
       Include file:  Device\Include\LPC17xx.h
       Source file:   Device\Source\system_LPC17xx.c
       Include file:  RTE_Driver\Config\RTE_Device.h
+      Source file:   Device\Source\ARM\startup_LPC17xx.s
 Build Time Elapsed:  00:00:00
 </pre>
 </body>
