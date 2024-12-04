@@ -1,10 +1,11 @@
 #include <LPC17xx.h>
 #include <math.h>
 #include "../PWM/reg_masks.h"
+#include "../PWM/PWM.c"
 
 // Constantes
 #define F_cpu         100e6                        // Frecuencia del sistema (xtal = 12 MHz)
-#define F_pclk        F_cpu / 4                   // PCLK configurado por defecto
+//#define F_pclk        F_cpu / 4                   // PCLK configurado por defecto
 #define voltageDiv    2.568
 #define Vref          3.3
 #define M_PI          3.14159265358979323846f
@@ -15,6 +16,14 @@
 
 static uint16_t sample_table[N_POINTS];
 static uint8_t  sample_idx;
+
+#define F_cpu 100e6          // Defecto Keil (xtal=12Mhz)
+#define F_pclk F_cpu/4       // PCLK configurado por defecto
+
+#define PIN_DIR_WHEEL_R 0x01 // P0.0 => direccion para rueda derecha
+#define PIN_DIR_WHEEL_L 0x02 // P0.1 => direccion para rueda izquierda
+#define WHEEL_R         0
+#define WHEEL_L         1
 
 void alarm_init(void)
 {
@@ -64,7 +73,8 @@ static uint8_t batteryInit = 0;
 static uint8_t speedInit = 0;
 volatile uint8_t batteryTrigger = 0;
 volatile uint8_t speedTrigger = 0;
-volatile uint8_t test = 0;
+volatile uint8_t speedIsvalid = 0;
+float* speedPtr;
 volatile float ADvoltage;
 volatile int prueba;
 
@@ -92,12 +102,12 @@ void ADC_init()
   // Configuración de los timers
   LPC_SC->PCONP |= (1 << 1);                   // Encender Timer0
   LPC_TIM0->PR = 0;                            // Sin prescaler
-  LPC_TIM0->MCR = (1 << 4) | (1 << 3);         // Reset en MR0.1 e interrupción
+  LPC_TIM0->MCR |= (1 << 4) | (1 << 3);         // Reset en MR0.1 e interrupción
   LPC_TIM0->EMR |= (2 << 6);                   // Set en Mat0.1
 
   LPC_SC->PCONP |= (1 << 2);                   // Encender Timer1
   LPC_TIM1->PR = 0;                            // Sin prescaler
-  LPC_TIM1->MCR = (1 << 2) | (1 << 0);         // Stop en MR0 e interrupción
+  LPC_TIM1->MCR |= (1 << 2) | (1 << 0);         // Stop en MR0 e interrupción
   LPC_TIM1->EMR |= (2 << 4);                   // Set en Mat1.0
 
   NVIC_EnableIRQ(TIMER0_IRQn);                 // Habilitar IRQ de Timer0
@@ -145,6 +155,7 @@ void speed_get_value(float Ts)
 
     speedInit = 1;                               // Marcar inicialización
     speedTrigger = 0;
+    speedIsvalid = 0;
   }
 }
 
@@ -181,6 +192,9 @@ void ADC_IRQHandler(void)
     LPC_ADC->ADCR &= ~(1 << 1);      // Desactivamos el canal ya que solo lo necesitamos una vez
     speedInit = 0; 
     speedTrigger = 0;
+    speedIsvalid = 1;
+    //*speedPtr = speed;
+    
   }
 }
 
@@ -205,7 +219,16 @@ int main()
     }
   }
   */
+  batValue = 5 ;
+  ADC_init();
+  pwm_config(1/1e3);
   alarm_init();
   alarm_set_freq(10000);
-  while(1);
+  speedIsvalid = 0;
+  
+  while( 1)
+  {
+    speed_get_value(1);
+    pwm_set_duty_cycle(-speed, speed);
+  }
 }
