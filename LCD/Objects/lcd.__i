@@ -1,0 +1,7 @@
+-c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork --split_sections
+-I.\RTE\Device\LPC1768
+-I.\RTE\_Target_1
+-IC:\Users\dieborr\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include
+-IC:\Users\dieborr\AppData\Local\Arm\Packs\Keil\LPC1700_DFP\2.7.2\Device\Include
+-D__UVISION_VERSION="530" -D_RTE_ -DLPC175x_6x -D_RTE_
+-o .\objects\lcd.o --omf_browse .\objects\lcd.crf --depend .\objects\lcd.d "LCD.c"

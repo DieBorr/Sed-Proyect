@@ -1,6 +1,6 @@
 #include <LPC17xx.h>
-#include "../UART/uart.h"
-#include "../GLCD/GLCD.h"
+#include "../UART/uart.c"
+#include "../GLCD/GLCD.c"
 #include <string.h>
 #include <stdio.h>
 
@@ -10,8 +10,8 @@
 
 char tx_msg[128];
 char rx_msg[128];
-
-int main() {
+/*
+int prueba() {
   int ret;
 
   // Serial port initialization:
@@ -31,5 +31,5 @@ int main() {
   while(1);
   return 0;
 }
-
+*/
 
