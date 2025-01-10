@@ -1,4 +1,5 @@
 .\objects\main.o: main.c
+.\objects\main.o: QEI.c
 .\objects\main.o: ../PWM/pwm.c
 .\objects\main.o: C:\Users\dieborr\AppData\Local\Arm\Packs\Keil\LPC1700_DFP\2.7.2\Device\Include\LPC17xx.h
 .\objects\main.o: C:\Users\dieborr\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\core_cm3.h
@@ -9,3 +10,14 @@
 .\objects\main.o: C:\Users\dieborr\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\mpu_armv7.h
 .\objects\main.o: C:\Users\dieborr\AppData\Local\Arm\Packs\Keil\LPC1700_DFP\2.7.2\Device\Include\system_LPC17xx.h
 .\objects\main.o: ../PWM/reg_masks.h
+.\objects\main.o: ../GLCD/GLCD.h
+.\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+.\objects\main.o: ../GLCD/GLCD.c
+.\objects\main.o: ../GLCD/AsciiLib.h
+.\objects\main.o: ../GLCD/AsciiLib.c
+.\objects\main.o: ../UART/UART.c
+.\objects\main.o: ../UART/uart.h
+.\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\main.o: ../ADC_DAC/ADC_DAC.c
+.\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
