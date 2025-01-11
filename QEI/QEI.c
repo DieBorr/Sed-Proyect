@@ -122,7 +122,7 @@ void int_to_char(int num, char *buffer) {
 }
 
 
-int QEI_go_front( float distance, float duty_cycle )
+int QEI_go_front( float distance )
 {
   float old_distance = cm;
   int almendra = 3;
