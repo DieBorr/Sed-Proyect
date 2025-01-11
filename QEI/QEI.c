@@ -3,6 +3,7 @@
 #include "../GLCD/GLCD.h"
 #include <stdio.h>
 #include <string.h>
+#include "../ADC_DAC/ADC_DAC.c"
 
 #define F_CPU             SystemCoreClock // From system_LPC17xx.h
 #define F_PCLK            F_CPU/4
@@ -30,7 +31,8 @@ static int velocidad;
 volatile float speed_Value2;
 volatile int  variable = 1;
 volatile int totalDistance = 0;
-char buffer[50];
+char buffer[2];
+volatile int prueba;
 
 void QEI_config(float t_glitch, float T_obs)
  {
@@ -73,6 +75,8 @@ void QEI_IRQHandler(void)
 int QEI_get_speed()
 {
   int speed_ValueToInt = ( LPC_QEI->QEICAP * dir * 2 * M_PI * Wheel_R) / ( R_GEARBOX * ENCODER_PPR * EDGES * T_Speed );
+  if(speed_ValueToInt > 100) speed_ValueToInt = LPC_QEI->QEIMAXPOS - speed_ValueToInt;
+  prueba = speed_ValueToInt;
   return speed_ValueToInt;
 }
 
@@ -84,7 +88,8 @@ void int_to_char(int num, char *buffer) {
 
     // Limpiar el buffer
     while (buffer[i] != '\0') {
-        buffer[i++] = '\0';
+        buffer[i] = '\0';
+        i++;
     }
     i = 0; // Reiniciar el índice para llenar el buffer
 
@@ -122,13 +127,18 @@ int QEI_go_front( float distance, float duty_cycle )
   float old_distance = cm;
   int almendra = 3;
   int old_speed = 0;
+  float speedValue;
+  
+  speed_get_value(0.001);
   cm = ( qei_pos / ( R_GEARBOX * ENCODER_PPR) );                              // * 2 * 3.14 * Wheel_R ;
-  pwm_set_duty_cycle(-duty_cycle, duty_cycle);                                              // Set duty cycle to 25%
-
+  pwm_set_duty_cycle(-1 * (speedValue), 1 * (speedValue));                  // Set duty cycle to 25%
   // La finalidad del ciclo while es que la distancia siempre sea positiva aunque la direccion sea negativa para poder tener la distancia recorrida efectiva.
   //distance = (2 * M_PI * 11.8) / 4 ;
   while( distance * 0.93 + old_distance > cm)   
   {
+    speedValue = get_speed();
+    speed_get_value();
+    pwm_set_duty_cycle(-1 * (speedValue), 1 * (speedValue));
     rpm = LPC_QEI->QEIPOS;
     dir = (LPC_QEI->QEISTAT & 0x1)? -1 : +1;
     if( dir == 1)

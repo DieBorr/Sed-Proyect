@@ -17,7 +17,7 @@ static uint16_t sample_table[N_POINTS];
 static uint8_t  sample_idx;
 
 // Variables globales
-float speed;
+float speed = -1;
 volatile float* speedPtr = &speed;
 volatile float batValue;
 volatile float* batVauePtr = &batValue;
@@ -28,6 +28,10 @@ volatile uint8_t batteryTrigger = 0;
 volatile uint8_t speedTrigger = 0;
 volatile float batteryMinValue;
 
+float get_speed() 
+{
+ return speed; 
+}
 void alarm_init(void)
 {
   int i;
@@ -100,13 +104,10 @@ void ADC_init()
   LPC_TIM0->MCR |= (1 << 4) | (1 << 3);         // Reset en MR0.1 e interrupción
   LPC_TIM0->EMR |= (2 << 6);                   // Set en Mat0.1
 
-  LPC_SC->PCONP |= (1 << 2);                   // Encender Timer1
-  LPC_TIM1->PR = 0;                            // Sin prescaler
-  LPC_TIM1->MCR |= (7 << 0);         // Reset en MR0 e interrupción
+
   //LPC_TIM1->EMR |= (2 << 4);                   // Set en Mat1.0
 
   NVIC_EnableIRQ(TIMER0_IRQn);                 // Habilitar IRQ de Timer0
-  NVIC_EnableIRQ(TIMER1_IRQn);                 // Habilitar IRQ de Timer1
   NVIC_SetPriority(ADC_IRQn,0);
   NVIC_EnableIRQ(ADC_IRQn);                    // Habilitar IRQ del ADC
 }
@@ -142,30 +143,15 @@ void TIMER0_IRQHandler() {
   }
 }
 
-void speed_get_value(float Ts)
+void speed_get_value()
 {
   if (!speedInit)
   {
-    LPC_TIM1->TCR |= (1 << 0);                    // Iniciar Timer1
-    LPC_TIM1->MR0 = (Ts * F_pclk) - 1;           // Configurar tiempo Ts
+    LPC_ADC->ADCR &= ~(0xFF);    // Limpiar cualquier canal previamente habilitado
+    LPC_ADC->ADCR |= (1 << 1);   // Habilitar el canal AD0.0 para conversión de batería
+    LPC_ADC->ADCR |= (1 << 24);  // Iniciar conversión
     speedInit = 1;                               // Marcar inicialización
     speedTimerTrigger = 1;
-  }
-}
-
-void TIMER1_IRQHandler() 
-{
-  if(speedTimerTrigger)
-  {
-    LPC_TIM1->IR  |=  (1 << 0);   // Borrar el flag de interrupción del Match 1.0
-    //LPC_TIM1->TCR &= ~(1 << 0);   // Paramos el timer, ya esta reseteado de antes
-    speedTrigger = 1;
-    // Configuración del canal AD0.1 (velocidad)
-    LPC_ADC->ADCR &= ~(0xFF << 0);       // Limpiar cualquier canal previamente habilitado
-    LPC_ADC->ADCR |=  (1 << 1);          // Habilitar el canal AD0.1 para conversión de velocidad
-    LPC_ADC->ADCR |=  (1 << 24);
-    speedTrigger = 1;
-    speedTimerTrigger = 0;
   }
 }
 

@@ -2,33 +2,21 @@
 #include "../GLCD/GLCD.c"
 #include "../GLCD/AsciiLib.c"
 #include "../UART/UART.c"
-#include "../ADC_DAC/ADC_DAC.c"
 
 char tx_msg[128];
 char rx_msg[128];
 
-
 int char_to_int(const char *str) {
-    int result = 0;
-    int sign = 1; // Por defecto positivo
-    int i = 0;
-
-    // Manejar signo
-    if (str[0] == '-') {
-        sign = -1; // Si es negativo
-        i++;
-    } else if (str[0] == '+') {
-        i++; // Si es explícitamente positivo
-    }
+  int result = 0;
+  int i = 0;
 
     // Convertir cada carácter al entero correspondiente
-    while (str[i] >= '0' && str[i] <= '9') {
-        result = result * 10 + (str[i] - '0');
-        i++;
-    }
+  while (str[i] >= '0' && str[i] <= '9') {
+      result = result * 10 + (str[i] - '0');
+      i++;
+  }
 
-    // Devolver el resultado con el signo
-    return result * sign;
+  return result;
 }
 
 void delimitedChar(const char* str, char* returnPointer, uint8_t from, uint8_t to)
@@ -47,6 +35,9 @@ int main()
   int length;
   char strBuffer[30];
   int num;
+  int dummyVariable;
+  int index = 3;
+  char b;
   
   pwm_config(1/1e3);
   pwm_set_duty_cycle(0,0);
@@ -54,7 +45,6 @@ int main()
   LCD_Initializtion();
   ADC_init();
   alarm_init();
-   alarm_set_freq(10000);
   // Serial port initialization:
   ret = uart0_init(9600);
   if(ret < 0) {
@@ -83,7 +73,39 @@ int main()
   uart0_fputs(strBuffer);
   GUI_Text(0,0,"La velocidad es: ",Blue,Black);
   GUI_Text(0,30,"La distancia es: ",Blue,Black);
-  QEI_go_front(100,0.5);
-  QEI_turn_vehicle( 1 );
+
+  while(index < length - 1) 
+  {
+  switch (rx_msg[index])
+  {
+    case 'A' : 
+    {
+      delimitedChar(rx_msg,strBuffer,index + 1, index + 2);
+      num = atoi(strBuffer);
+      QEI_go_front(num,0.5);
+      uart0_fputs("Haciendo A\n");
+      break;
+    }
+    case 'R' : 
+    {
+      delimitedChar(rx_msg,strBuffer,index + 1, index + 2);
+      num = atoi(strBuffer);
+      QEI_turn_vehicle( 0 );
+      QEI_go_front(num,0.5);
+      uart0_fputs("Haciendo R\n");
+      break;
+    }
+    case 'L' : 
+    {
+      delimitedChar(rx_msg,strBuffer,index + 1, index + 2);
+      num = atoi(strBuffer);
+      QEI_turn_vehicle( 1 );
+      QEI_go_front(num,0.5);
+      break;
+    }
+  }
+  uart0_fputs("Bucle\n");
+  index += 3;
+  }
   while(1);
 }
