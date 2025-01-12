@@ -1,9 +1,10 @@
-#include "../PWM/pwm.c" //incluimos el archivo con funciones de pwm del anterior hito
-#include <LPC17xx.h>
+#include "../PWM/pwm.c"
+#include "../ADC_DAC/ADC_DAC.c"
 #include "../GLCD/GLCD.h"
+#include <LPC17xx.h>
 #include <stdio.h>
 #include <string.h>
-#include "../ADC_DAC/ADC_DAC.c"
+#include <stdlib.h>
 
 #define F_CPU             SystemCoreClock // From system_LPC17xx.h
 #define F_PCLK            F_CPU/4
@@ -19,26 +20,20 @@
 
 float static T_Speed;
 float qei_pos;
-volatile int _qei_dir;
 float qei_speed;
-int* qei_speedPtr;
 int qei_err;
 int rpm;
 int cm;
 int dir;
 int qei_pos_old;
-static int velocidad;
-volatile float speed_Value2;
-volatile int  variable = 1;
 volatile int totalDistance = 0;
-char buffer[2];
-volatile int prueba;
+char buffer[3];
 
 void QEI_config(float t_glitch, float T_obs)
- {
+{
   uint32_t filter_code, n_obs;
   T_Speed = T_obs;
-  
+
   LPC_SC->PCLKSEL1 &= ~PCLK_QEI_MASK;
   LPC_SC->PCLKSEL1 |= PCLK_QEI_DIV_4;               // PCLK_QEI = CCLK/4 (25 MHz)
   LPC_SC->PCONP |= PCQEI;                           // Quadrature Encoder Interface power on
@@ -76,7 +71,6 @@ int QEI_get_speed()
 {
   int speed_ValueToInt = ( LPC_QEI->QEICAP * dir * 2 * M_PI * Wheel_R) / ( R_GEARBOX * ENCODER_PPR * EDGES * T_Speed );
   if(speed_ValueToInt > 100) speed_ValueToInt = LPC_QEI->QEIMAXPOS - speed_ValueToInt;
-  prueba = speed_ValueToInt;
   return speed_ValueToInt;
 }
 
@@ -86,55 +80,44 @@ void int_to_char(int num, char *buffer) {
     int is_negative = 0;
     char temp;
 
-    // Limpiar el buffer
-    while (buffer[i] != '\0') {
+    while (buffer[i] != '\0')
+    {
         buffer[i] = '\0';
         i++;
     }
-    i = 0; // Reiniciar el índice para llenar el buffer
-
-    // Manejar el caso de un número negativo
-    if (num < 0) {
+    i = 0;
+    if (num < 0)
+    {
         is_negative = 1;
         num = -num;
     }
-
-    // Extraer dígitos de forma inversa
-    do {
-        buffer[i++] = (num % 10) + '0'; // Convertir dígito a carácter
+    do
+    {
+        buffer[i++] = (num % 10) + '0';
         num /= 10;
     } while (num > 0);
-
-    // Agregar el signo negativo si corresponde
-    if (is_negative) {
-        buffer[i++] = '-';
-    }
-
-    // Terminar la cadena con un carácter nulo
+    if (is_negative) buffer[i++] = '-';
     buffer[i] = '\0';
 
-    // Invertir el buffer para obtener el orden correcto
-    for (j = 0; j < i / 2; j++) {
+    for (j = 0; j < i / 2; j++)
+    {
         temp = buffer[j];
         buffer[j] = buffer[i - j - 1];
         buffer[i - j - 1] = temp;
     }
 }
 
-
 int QEI_go_front( float distance )
 {
   float old_distance = cm;
-  int almendra = 3;
   int old_speed = 0;
   float speedValue;
   
-  speed_get_value(0.001);
-  cm = ( qei_pos / ( R_GEARBOX * ENCODER_PPR) );                              // * 2 * 3.14 * Wheel_R ;
-  pwm_set_duty_cycle(-1 * (speedValue), 1 * (speedValue));                  // Set duty cycle to 25%
-  // La finalidad del ciclo while es que la distancia siempre sea positiva aunque la direccion sea negativa para poder tener la distancia recorrida efectiva.
-  //distance = (2 * M_PI * 11.8) / 4 ;
-  while( distance * 0.93 + old_distance > cm)   
+  speed_get_value();
+  cm = ( qei_pos / ( R_GEARBOX * ENCODER_PPR) );
+  pwm_set_duty_cycle(-1 * (speedValue), 1 * (speedValue));  
+
+  while( distance * 0.93 + old_distance > cm)
   {
     speedValue = get_speed();
     speed_get_value();
@@ -158,24 +141,21 @@ int QEI_go_front( float distance )
       }
     }
     cm = ( qei_pos / ( R_GEARBOX * ENCODER_PPR * EDGES )) * 2 * M_PI * Wheel_R ;
-    //QEI_get_speed();
-    if(abs(QEI_get_speed() - old_speed) > 1) {
-      almendra = distance + + old_distance;
-      //if(abs(QEI_get_speed() - old_speed) > 2) continue;
+    if(abs(QEI_get_speed() - old_speed) > 1)
+    {
       int_to_char(QEI_get_speed(), buffer);
-      GUI_Text(150,0,buffer,Blue,Black) ;
-      variable = 0;
+      GUI_Text(150,0,(uint8_t *)buffer,Blue,Black) ;
       old_speed = QEI_get_speed();
     }
-    else variable++; 
-    if(cm % 5 == 0) {
+    if(cm % 5 == 0)
+    {
     int_to_char(cm, buffer);
-    GUI_Text(150,30,buffer,Blue,Black);
+    GUI_Text(150,30,(uint8_t *)buffer,Blue,Black);
     }
   }
   totalDistance += distance;
   int_to_char(totalDistance, buffer);
-  GUI_Text(150,30,buffer,Blue,Black);
+  GUI_Text(150,30,(uint8_t *)buffer,Blue,Black);
   pwm_stop();
   return 1;
 }
@@ -184,8 +164,8 @@ int QEI_turn_vehicle( uint8_t left )
 {
   float old_distance = cm;
   float distance = (2 * M_PI * 11.8) / 4 ;
-  cm = ( qei_pos / ( R_GEARBOX * ENCODER_PPR) );                              // * 2 * 3.14 * Wheel_R ;
-  left ? pwm_set_duty_cycle(0.4, 0.4) : pwm_set_duty_cycle(-0.4, -0.4);
+  cm = ( qei_pos / ( R_GEARBOX * ENCODER_PPR) );
+  left ? pwm_set_duty_cycle(0.4, 0.4) : pwm_set_duty_cycle(-0.4, -0.4); //fixed speed
 
   while( distance * 0.93 + old_distance > cm)   
   {
@@ -211,7 +191,7 @@ int QEI_turn_vehicle( uint8_t left )
   }
   totalDistance += distance;
   int_to_char(totalDistance, buffer);
-  GUI_Text(150,30,buffer,Blue,Black);
+  GUI_Text(150,30,(uint8_t *)buffer,Blue,Black);
   pwm_stop();
   return 1;
 }

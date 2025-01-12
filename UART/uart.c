@@ -1,10 +1,5 @@
 #include "uart.h"
-
 #include <LPC17xx.h>
-
-// Board features:
-#define F_CPU     (SystemCoreClock)   // From system_LPC17xx.h
-#define F_PCLK    (F_CPU/4)
 
 // Accepted Error baud rate value (in percent unit)
 #define UART_ACCEPTED_BAUDRATE_ERROR    3
