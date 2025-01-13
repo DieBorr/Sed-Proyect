@@ -22,7 +22,7 @@ float static T_Speed;
 float qei_pos;
 float qei_speed;
 int qei_err;
-int rpm;
+int qei_new_pos;
 int cm;
 int dir;
 int qei_pos_old;
@@ -122,40 +122,40 @@ int QEI_go_front( float distance )
     speedValue = get_speed();
     speed_get_value();
     pwm_set_duty_cycle(-1 * (speedValue), 1 * (speedValue));
-    rpm = LPC_QEI->QEIPOS;
+    qei_new_pos = LPC_QEI->QEIPOS;
     dir = (LPC_QEI->QEISTAT & 0x1)? -1 : +1;
     if( dir == 1)
     {
-      if( rpm > qei_pos_old)
+      if( qei_new_pos > qei_pos_old)
       {
-        qei_pos = qei_pos + rpm - qei_pos_old;
-        qei_pos_old = rpm;
+        qei_pos = qei_pos + qei_new_pos - qei_pos_old;
+        qei_pos_old = qei_new_pos;
       }
     }
     else 
     {
-      if( qei_pos_old > rpm )
+      if( qei_pos_old > qei_new_pos )
       {
-        qei_pos = qei_pos + qei_pos_old - rpm;
-        qei_pos_old = rpm;
+        qei_pos = qei_pos + qei_pos_old - qei_new_pos;
+        qei_pos_old = qei_new_pos;
       }
     }
     cm = ( qei_pos / ( R_GEARBOX * ENCODER_PPR * EDGES )) * 2 * M_PI * Wheel_R ;
     if(abs(QEI_get_speed() - old_speed) > 1)
     {
       int_to_char(QEI_get_speed(), buffer);
-      GUI_Text(150,0,(uint8_t *)buffer,Blue,Black) ;
+      GUI_Text(180,0,(uint8_t *)buffer,Blue,Black) ;
       old_speed = QEI_get_speed();
     }
     if(cm % 5 == 0)
     {
     int_to_char(cm, buffer);
-    GUI_Text(150,30,(uint8_t *)buffer,Blue,Black);
+    GUI_Text(180,30,(uint8_t *)buffer,Blue,Black);
     }
   }
   totalDistance += distance;
   int_to_char(totalDistance, buffer);
-  GUI_Text(150,30,(uint8_t *)buffer,Blue,Black);
+  GUI_Text(180,30,(uint8_t *)buffer,Blue,Black);
   pwm_stop();
   return 1;
 }
@@ -165,26 +165,26 @@ int QEI_turn_vehicle( uint8_t left )
   float old_distance = cm;
   float distance = (2 * M_PI * 11.8) / 4 ;
   cm = ( qei_pos / ( R_GEARBOX * ENCODER_PPR) );
-  left ? pwm_set_duty_cycle(0.4, 0.4) : pwm_set_duty_cycle(-0.4, -0.4); //fixed speed
+  left ? pwm_set_duty_cycle(0.4, 0.4) : pwm_set_duty_cycle(-0.4, -0.4); // velocidad fija
 
-  while( distance * 0.93 + old_distance > cm)   
+  while( distance * 0.80 + old_distance > cm)   
   {
-    rpm = LPC_QEI->QEIPOS;
+    qei_new_pos = LPC_QEI->QEIPOS;
     dir = (LPC_QEI->QEISTAT & 0x1)? -1 : +1;
     if( dir == 1)
     {
-      if( rpm > qei_pos_old)
+      if( qei_new_pos > qei_pos_old)
       {
-        qei_pos = qei_pos + rpm - qei_pos_old;
-        qei_pos_old = rpm;
+        qei_pos = qei_pos + qei_new_pos - qei_pos_old;
+        qei_pos_old = qei_new_pos;
       }
     }
     else 
     {
-      if( qei_pos_old > rpm )
+      if( qei_pos_old > qei_new_pos )
       {
-        qei_pos = qei_pos + qei_pos_old - rpm;
-        qei_pos_old = rpm;
+        qei_pos = qei_pos + qei_pos_old - qei_new_pos;
+        qei_pos_old = qei_new_pos;
       }
     }
     cm = ( qei_pos / ( R_GEARBOX * ENCODER_PPR * EDGES )) * 2 * M_PI * Wheel_R ;
