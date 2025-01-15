@@ -115,8 +115,7 @@ int QEI_go_front( float distance )
   
   speed_get_value();
   cm = ( qei_pos / ( R_GEARBOX * ENCODER_PPR) );
-  pwm_set_duty_cycle(-1 * (speedValue), 1 * (speedValue));  
-
+  pwm_set_duty_cycle(-1 * (speedValue), 1 * (speedValue));
   while( distance * 0.93 + old_distance > cm)
   {
     speedValue = get_speed();
@@ -141,7 +140,7 @@ int QEI_go_front( float distance )
       }
     }
     cm = ( qei_pos / ( R_GEARBOX * ENCODER_PPR * EDGES )) * 2 * M_PI * Wheel_R ;
-    if(abs(QEI_get_speed() - old_speed) > 1)
+    if(abs(QEI_get_speed() - old_speed) > 1 && abs(QEI_get_speed()) < 60)
     {
       int_to_char(QEI_get_speed(), buffer);
       GUI_Text(180,0,(uint8_t *)buffer,Blue,Black) ;
@@ -163,11 +162,11 @@ int QEI_go_front( float distance )
 int QEI_turn_vehicle( uint8_t left )
 {
   float old_distance = cm;
-  float distance = (2 * M_PI * 11.8) / 4 ;
+  float distance = (2 * M_PI * 12.5) / 4 ;
   cm = ( qei_pos / ( R_GEARBOX * ENCODER_PPR) );
   left ? pwm_set_duty_cycle(0.4, 0.4) : pwm_set_duty_cycle(-0.4, -0.4); // velocidad fija
 
-  while( distance * 0.80 + old_distance > cm)   
+  while( distance * 0.85 + old_distance > cm)   
   {
     qei_new_pos = LPC_QEI->QEIPOS;
     dir = (LPC_QEI->QEISTAT & 0x1)? -1 : +1;

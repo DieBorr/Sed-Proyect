@@ -1,7 +1,7 @@
 Dependencies for Project 'main', Target 'Target 1': (DO NOT MODIFY !)
 CompilerVersion: 5060750::V5.06 update 6 (build 750)::.\ARMCC
-F (.\main.c)(0x67856B71)(-c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork --split_sections-I.\RTE\Device\LPC1768-I.\RTE\_Target_1-IC:\Users\dieborr\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\dieborr\AppData\Local\Arm\Packs\Keil\LPC1700_DFP\2.7.2\Device\Include-D__UVISION_VERSION="530" -D_RTE_ -DLPC175x_6x -D_RTE_-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
-I (../QEI/QEI.c)(0x67855D3D)
+F (.\main.c)(0x67880B90)(-c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork --split_sections-I.\RTE\Device\LPC1768-I.\RTE\_Target_1-IC:\Users\dieborr\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include-IC:\Users\dieborr\AppData\Local\Arm\Packs\Keil\LPC1700_DFP\2.7.2\Device\Include-D__UVISION_VERSION="530" -D_RTE_ -DLPC175x_6x -D_RTE_-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
+I (../QEI/QEI.c)(0x67880FF5)
 I (../QEI/../PWM/pwm.c)(0x677FED81)
 I (C:\Users\dieborr\AppData\Local\Arm\Packs\Keil\LPC1700_DFP\2.7.2\Device\Include\LPC17xx.h)(0x65C63E3E)
 I (C:\Users\dieborr\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\core_cm3.h)(0x5E8F2582)
@@ -12,10 +12,10 @@ I (C:\Users\dieborr\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\c
 I (C:\Users\dieborr\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include\mpu_armv7.h)(0x5E8F2582)
 I (C:\Users\dieborr\AppData\Local\Arm\Packs\Keil\LPC1700_DFP\2.7.2\Device\Include\system_LPC17xx.h)(0x65C63E3E)
 I (../QEI/../PWM/reg_masks.h)(0x67798133)
-I (../QEI/../ADC_DAC/ADC_DAC.c)(0x6783E9B4)
+I (../QEI/../ADC_DAC/ADC_DAC.c)(0x678806DC)
 I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x5E53A4BA)
-I (../QEI/../GLCD/GLCD.h)(0x67816D4C)
 I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5E53A4BC)
+I (../QEI/../ADC_DAC/../GLCD/GLCD.h)(0x67816D4C)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x5E53A4BC)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5E53A4BC)
 I (../GLCD/GLCD.c)(0x67798152)

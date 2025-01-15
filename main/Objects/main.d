@@ -12,8 +12,8 @@
 .\objects\main.o: ../QEI/../PWM/reg_masks.h
 .\objects\main.o: ../QEI/../ADC_DAC/ADC_DAC.c
 .\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
-.\objects\main.o: ../QEI/../GLCD/GLCD.h
 .\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\main.o: ../QEI/../ADC_DAC/../GLCD/GLCD.h
 .\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 .\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\main.o: ../GLCD/GLCD.c

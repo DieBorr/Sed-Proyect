@@ -1,6 +1,8 @@
 #include <LPC17xx.h>
 #include <math.h>
+#include <stdio.h>
 #include "../PWM/reg_masks.h"
+#include "../GLCD/GLCD.h"
 
 // Constantes
 #define F_cpu         100e6        // Frecuencia del sistema (xtal = 12 MHz)
@@ -27,6 +29,26 @@ static uint8_t speedInit = 0;
 volatile uint8_t batteryTrigger = 0;
 volatile uint8_t speedTrigger = 0;
 volatile float batteryMinValue;
+char batBuffer[4];
+
+void float_to_char(float number, char *buffer) {
+    int int_part = (int)number;
+    float fractional_part = number - int_part;
+    char *ptr = buffer;
+    int fractional_as_int = (int)((fractional_part * 1000000) + 0.5);
+    int i;
+
+    ptr += sprintf(ptr, "%d", int_part);
+    *ptr++ = '.';
+
+    for (i = 0; i < 6; i++) {
+        *ptr++ = '0' + (fractional_as_int / 100000);
+        fractional_as_int %= 100000;
+        fractional_as_int *= 10;
+    }
+
+    *ptr = '\0';
+}
 
 float get_speed() 
 {
@@ -163,9 +185,11 @@ void ADC_IRQHandler(void)
   if (LPC_ADC->ADDR0 & (1U << 31) && batteryTrigger && !((LPC_ADC->ADGDR >> 24) & (0x7)) ) // Sabemos que se ha ejecutado esta conversión gracias al Mat0.1
   {
     float ADvoltage = ((LPC_ADC->ADDR0 >> 4) & 0xFFC);
-    batValue =    ADvoltage * (( Vref * voltageDiv ) / 4095.0 ) ; // Leer valor ADC
+    batValue = ADvoltage * (( Vref * voltageDiv ) / 4095.0 ) ; // Leer valor ADC
     batteryTrigger = 0;
     batValue < batteryMinValue ? alarm_set_freq(10000) : alarm_set_freq(0);
+    float_to_char(batValue, batBuffer);
+    GUI_Text(172,60,(uint8_t *)batBuffer,Blue,Black);
   }
 
   // Verificar conversión de AD0.1 (velocidad)

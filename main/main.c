@@ -100,6 +100,7 @@ int main()
   while(!buttonPressed);
   GUI_Text(0,0,(uint8_t *)"Valor de la velocidad: ",Blue,Black);
   GUI_Text(0,30,(uint8_t *)"Valor de la distancia: ",Blue,Black);
+  GUI_Text(0,60,(uint8_t *)"Valor de la bateria: ",Blue,Black);
 
   while(index < length - 1 )
   {
@@ -110,7 +111,7 @@ int main()
         delimitedChar(rx_msg,strBuffer, 1,2);
         minVoltage = char_to_int(strBuffer);
         if(minVoltage == -1) goto error;
-        battery_sampling_init(1, minVoltage);
+        battery_sampling_init(5, minVoltage);
         break;
       }
       case 'F' : 
